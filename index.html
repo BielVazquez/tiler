@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>Lanzamiento de Camisetas</title>
     <style>
         body {
@@ -41,10 +42,31 @@
             cursor: pointer;
         }
 
-        video {
+        .rotate-device {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 45%;
-            height: auto;
+            height: 100%;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000; /* Asegura que esté en la parte superior */
+            display: none;
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+
+        .rotate-device-icon {
+            font-size: 4em;
+        }
+
+        video {
+            width: 50%;
+            height: 100%;
+            object-fit: cover;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
@@ -74,9 +96,45 @@
             height: auto;
         }
 
+        .btn-slide-down {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            color: #000;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            z-index: 999; /* Asegura que esté en la parte superior */
+        }
+
+        .video-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: none;
+            z-index: 1000; /* Asegura que esté en la parte superior */
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         @media screen and (max-width: 767px) {
             .overlay-text {
                 top: 10%;
+            }
+            video {
+                width: 100%;
+                object-fit: contain; /* Ajusta el estilo para mantener la relación de aspecto */
             }
         }
     </style>
@@ -84,6 +142,13 @@
 <body>
     <div class="start-screen" onclick="startVideos()">
         <div class="start-screen-text">Haz clic aquí para comenzar</div>
+    </div>
+
+    <div class="rotate-device" id="rotate-device">
+        <i class="fas fa-rotate-90 rotate-device-icon"></i>
+        <div class="rotate-device-text">
+            Gire su dispositivo para una mejor experiencia.
+        </div>
     </div>
 
     <div class="logo">
@@ -94,25 +159,93 @@
         <source src="Black.mp4" type="video/mp4">
         Tu navegador no soporta el tag de video.
     </video>
-    <div class="overlay-text">Coming Soon</div>
-
     <video id="video2" autoplay loop muted playsinline>
         <source src="White.mp4" type="video/mp4">
         Tu navegador no soporta el tag de video.
     </video>
+    <video id="video3" autoplay loop muted playsinline style="display: none;">
+        <source src="Video3.mp4" type="video/mp4">
+        Tu navegador no soporta el tag de video.
+    </video>
+    <video id="otroVideo" autoplay loop muted playsinline style="display: none;">
+        <source src="OtroVideo.mp4" type="video/mp4">
+        Tu navegador no soporta el tag de video.
+    </video>
+    <video id="otroVideoHorizontal" autoplay loop muted playsinline>
+        <source src="OtroVideo_Horizontal.mp4" type="video/mp4">
+        Tu navegador no soporta el tag de video.
+    </video>
     <div class="overlay-text">Coming Soon</div>
 
+    <button class="btn-slide-down" onclick="slideDown()">Deslizar hacia abajo</button>
+
+    <div class="video-container" id="bottom-video">
+        <video autoplay loop muted playsinline>
+            <source src="otroVideo.mp4" type="video/mp4">
+            Tu navegador no soporta el tag de video.
+        </video>
+    </div>
+
     <script>
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
         function startVideos() {
             var startScreen = document.querySelector('.start-screen');
+            var rotateDevice = document.getElementById('rotate-device');
             startScreen.style.display = 'none';
 
             var video1 = document.getElementById('video1');
             var video2 = document.getElementById('video2');
+            var video3 = document.getElementById('video3');
+            var otroVideo = document.getElementById('otroVideo');
+            var otroVideoHorizontal = document.getElementById('otroVideoHorizontal');
 
-            video1.play();
-            video2.play();
+            // Detecta si es un dispositivo móvil
+            if (window.innerWidth <= 767) {
+                video1.style.display = 'none';
+                video2.style.display = 'none';
+                video3.style.display = 'block';
+                otroVideo.style.display = 'none';
+                otroVideoHorizontal.style.display = 'none';
+                video3.play();
+            } else {
+                video1.style.display = 'block';
+                video2.style.display = 'block';
+                video3.style.display = 'none';
+                otroVideo.style.display = 'block';
+                otroVideoHorizontal.style.display = 'none';
+                video1.play();
+                video2.play();
+                otroVideo.play();
+            }
         }
+
+        function slideDown() {
+            var btnSlideDown = document.querySelector('.btn-slide-down');
+            var rotateDevice = document.getElementById('rotate-device');
+            var videoContainer = document.getElementById('bottom-video');
+
+            // Muestra el mensaje de rotación solo en dispositivos móviles
+            if (isMobileDevice()) {
+                rotateDevice.style.display = 'flex';
+            }
+
+            // Oculta el botón cuando el usuario hace clic en "Deslizar hacia abajo"
+            btnSlideDown.style.display = 'none';
+
+            // Muestra el video en la parte inferior
+            videoContainer.style.display = 'block';
+        }
+
+        // Detecta cambios en la orientación del dispositivo
+        window.addEventListener("orientationchange", function() {
+            var rotateDevice = document.getElementById('rotate-device');
+
+            // Oculta el mensaje de rotación cuando se detecta un cambio en la orientación
+            rotateDevice.style.display = 'none';
+        });
     </script>
 </body>
 </html>
